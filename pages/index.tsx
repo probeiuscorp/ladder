@@ -61,7 +61,7 @@ export default function Home() {
                 }
                 setSelected(data[data.length - 1]);
             } else if(e.key === 'Enter') {
-                handlePicked(selected);
+                handlePicked(selected ?? value);
             }
         }
         window.addEventListener('keydown', handler);
