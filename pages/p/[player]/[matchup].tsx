@@ -6,6 +6,8 @@ import React from 'react';
 import { Race } from ':/view/Race';
 import { NextPageContext } from 'next';
 import { Mongo } from ':/lib/mongodb';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 
 const ResultTicker = ({ change }: { change: number }) => (
     <StatHelpText>
@@ -33,10 +35,14 @@ export type PageAccountProps = {
         }[],
         recentMatches: {
             build: string,
-            change: number
+            change: number,
+            date: number
         }[]
     }
 }
+
+TimeAgo.addDefaultLocale(en);
+const timeAgo = new TimeAgo('en-US');
 
 export default function PageAccount({ data }: PageAccountProps) {
     return (
@@ -55,7 +61,6 @@ export default function PageAccount({ data }: PageAccountProps) {
                 <Text>
                     {data.beaten} - {data.losses}
                 </Text>
-                &bull;
                 <Stat>
                     <ResultTicker change={data.net}/>
                 </Stat>
@@ -95,13 +100,14 @@ export default function PageAccount({ data }: PageAccountProps) {
                 )}
             <Spacer/>
             <SubmitMatchForm data={data}/>
+            <Spacer/>
             {data.recentMatches.length > 0
                 ? (
                     <TableContainer width="100%">
                         <Heading size="xs">Recent matches</Heading>
                         <Table size="sm">
                             <Tbody>
-                                {data.recentMatches.map(({ build, change }, i) => (
+                                {data.recentMatches.map(({ date, build, change }, i) => (
                                     <Tr key={i}>
                                         <Td>
                                             <Stat size="sm">
@@ -110,6 +116,9 @@ export default function PageAccount({ data }: PageAccountProps) {
                                         </Td>
                                         <Td width="2500px">
                                             {build}
+                                        </Td>
+                                        <Td>
+                                            {timeAgo.format(date, 'twitter')} ago
                                         </Td>
                                     </Tr>
                                 ))}
@@ -127,7 +136,7 @@ export default function PageAccount({ data }: PageAccountProps) {
     );
 }
 
-export async function getServerSideProps(ctx: NextPageContext) {
+export async function getServerSideProps(ctx: NextPageContext): Promise<{ props: PageAccountProps }> {
     const player = ctx.query.player as string;
     const matchup = ctx.query.matchup as string;
     const [me, them] = racesForMatchup(matchup);
@@ -184,8 +193,9 @@ export async function getServerSideProps(ctx: NextPageContext) {
             them
         }).limit(12).sort({
             date: -1
-        }).project<{ build: string, change: number }>({
+        }).project<{ date: Date, build: string, change: number }>({
             _id: 0,
+            date: 1,
             build: 1,
             change: 1
         }).toArray(),
@@ -208,7 +218,7 @@ export async function getServerSideProps(ctx: NextPageContext) {
                 losses,
                 net,
                 builds: builds.map(({ _id, ...build }) => ({ ...build, description: _id })),
-                recentMatches
+                recentMatches: recentMatches.map(({ date, ...match }) => ({ ...match, date: date.valueOf() }))
             }
         }
     };

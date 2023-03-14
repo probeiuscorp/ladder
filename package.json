@@ -12,6 +12,7 @@
     "@emotion/styled": "^11.10.6",
     "formik": "^2.2.9",
     "framer-motion": "^10.0.1",
+    "javascript-time-ago": "^2.5.9",
     "mongodb": "^5.1.0",
     "next": "latest",
     "react": "18.2.0",
