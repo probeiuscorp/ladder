@@ -118,7 +118,7 @@ export default function PageAccount({ data }: PageAccountProps) {
                                             {build}
                                         </Td>
                                         <Td>
-                                            {timeAgo.format(date, 'twitter')} ago
+                                            {timeAgo.format(date, 'twitter')}
                                         </Td>
                                     </Tr>
                                 ))}
