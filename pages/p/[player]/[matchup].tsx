@@ -41,7 +41,7 @@ export type PageAccountProps = {
     }
 }
 
-TimeAgo.addDefaultLocale(en);
+TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
 export default function PageAccount({ data }: PageAccountProps) {
@@ -84,7 +84,7 @@ export default function PageAccount({ data }: PageAccountProps) {
                                                 <ResultTicker change={build.net}/>
                                             </Stat>
                                         </Td>
-                                        <Td width="2500px">
+                                        <Td width="2500px" whiteSpace="break-spaces">
                                             {build.description}
                                         </Td>
                                     </Tr>
@@ -114,7 +114,7 @@ export default function PageAccount({ data }: PageAccountProps) {
                                                 <ResultTicker change={change}/>
                                             </Stat>
                                         </Td>
-                                        <Td width="2500px">
+                                        <Td width="2500px" whiteSpace="break-spaces">
                                             {build}
                                         </Td>
                                         <Td>
