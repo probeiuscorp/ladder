@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { KeyboardEventHandler, useEffect, useState } from 'react';
 import { Page } from ':/view/Page';
 import { Box, Input, Spinner, VStack } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
@@ -40,39 +40,36 @@ export default function Home() {
         }
     }, [value]);
 
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            if(e.key === 'ArrowDown') {
-                if(selected) {
-                    const i = data.indexOf(selected);
-                    if(i !== -1) {
-                        setSelected(data[Math.min(data.length, i + 1)]);
-                        return;
-                    }
+    const handler: KeyboardEventHandler = (e) => {
+        if(e.key === 'ArrowDown') {
+            if(selected) {
+                const i = data.indexOf(selected);
+                if(i !== -1) {
+                    setSelected(data[Math.min(data.length, i + 1)]);
+                    return;
                 }
-                setSelected(data[0]);
-            } else if(e.key === 'ArrowUp') {
-                if(selected) {
-                    const i = data.indexOf(selected);
-                    if(i !== -1) {
-                        setSelected(data[Math.max(0, i - 1)]);
-                        return;
-                    }
-                }
-                setSelected(data[data.length - 1]);
-            } else if(e.key === 'Enter') {
-                handlePicked(selected ?? value);
             }
+            setSelected(data[0]);
+        } else if(e.key === 'ArrowUp') {
+            if(selected) {
+                const i = data.indexOf(selected);
+                if(i !== -1) {
+                    setSelected(data[Math.max(0, i - 1)]);
+                    return;
+                }
+            }
+            setSelected(data[data.length - 1]);
+        } else if(e.key === 'Enter') {
+            handlePicked(selected ?? value);
         }
-        window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
-    }, [selected, data]);
+    };
 
     return (
         <Page>
             <Input
                 value={value}
                 onChange={e => setValue(e.target.value)}
+                onKeyDown={handler}
                 autoFocus
             />
             {data === null

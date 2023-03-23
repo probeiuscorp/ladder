@@ -9,7 +9,7 @@ import { Mongo } from ':/lib/mongodb';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
-const ResultTicker = ({ change }: { change: number }) => (
+export const ResultTicker = ({ change }: { change: number }) => (
     <StatHelpText>
         <StatArrow
             type={change >= 0 ? 'increase' : 'decrease'}
@@ -20,6 +20,7 @@ const ResultTicker = ({ change }: { change: number }) => (
 );
 
 export type PageAccountProps = {
+    now: number,
     data: {
         name: string,
         me: race,
@@ -44,7 +45,7 @@ export type PageAccountProps = {
 TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
-export default function PageAccount({ data }: PageAccountProps) {
+export default function PageAccount({ now, data }: PageAccountProps) {
     return (
         <Page title={`${data.name} | Ladder`}>
             <HStack>
@@ -118,7 +119,7 @@ export default function PageAccount({ data }: PageAccountProps) {
                                             {build}
                                         </Td>
                                         <Td>
-                                            {timeAgo.format(date, 'twitter')}
+                                            {timeAgo.format(date, 'twitter', { now })}
                                         </Td>
                                     </Tr>
                                 ))}
@@ -174,7 +175,7 @@ export async function getServerSideProps(ctx: NextPageContext): Promise<{ props:
                         $sum: '$change'
                     },
                     n: {
-                        $count: {}
+                        $sum: 1
                     }
                 }
             }, {
@@ -210,6 +211,7 @@ export async function getServerSideProps(ctx: NextPageContext): Promise<{ props:
 
     return {
         props: {
+            now: Date.now(),
             data: {
                 name: player,
                 me,

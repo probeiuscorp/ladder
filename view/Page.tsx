@@ -16,9 +16,11 @@ export function Page({ title = 'Ladder', children }: React.PropsWithChildren<Pag
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Center m="2">
-                <VStack width="600px">
+                <VStack minWidth="600px">
                     <Flex gap={1.5} fontSize="smaller">
                         <Link href="/">lookup</Link>
+                        &bull;
+                        <Link href="/insights">insights</Link>
                     </Flex>
                     {children}
                 </VStack>
