@@ -47,7 +47,7 @@ export type PageInsightsProps = {
 
 export default function PageInsights({ week }: PageInsightsProps) {
     return (
-        <Page>
+        <Page minWidth="600px" width="revert">
             <Heading>Last week</Heading>
             <TableContainer overflow="visible">
                 <Table>

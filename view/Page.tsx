@@ -1,4 +1,4 @@
-import { Center, Flex, VStack } from '@chakra-ui/react';
+import { Center, ChakraProps, Flex, VStack } from '@chakra-ui/react';
 import Head from 'next/head';
 import React from 'react';
 import { Link } from './Link';
@@ -6,9 +6,9 @@ import { Link } from './Link';
 export type PageProps = {
     title?: string
     className?: string,
-}
+} & ChakraProps;
 
-export function Page({ title = 'Ladder', children }: React.PropsWithChildren<PageProps>) {
+export function Page({ title = 'Ladder', children, ...props }: React.PropsWithChildren<PageProps>) {
     return (
         <main>
             <Head>
@@ -16,7 +16,7 @@ export function Page({ title = 'Ladder', children }: React.PropsWithChildren<Pag
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Center m="2">
-                <VStack minWidth="600px">
+                <VStack width="600px" {...props}>
                     <Flex gap={1.5} fontSize="smaller">
                         <Link href="/">lookup</Link>
                         &bull;
