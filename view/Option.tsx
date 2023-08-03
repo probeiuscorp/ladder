@@ -4,9 +4,10 @@ import { OptionContext, useOptionsDescendant } from './Options';
 
 export type OptionProps = React.PropsWithChildren<{
     icon: React.ReactNode
+    onClick?(): void;
 }>;
 
-export function Option({ icon, children }: OptionProps) {
+export function Option({ icon, children, onClick }: OptionProps) {
     const { index, register } = useOptionsDescendant();
     const selected = useContext(OptionContext);
     const isActive = index === selected;
@@ -19,7 +20,7 @@ export function Option({ icon, children }: OptionProps) {
             fontFamily="heading"
             boxShadow={isActive ? "outline" : undefined}
             ref={register}
-            onClick={() => alert(children)}
+            onClick={onClick}
         >
             <Box p={5} pb={1}>
                 {icon}

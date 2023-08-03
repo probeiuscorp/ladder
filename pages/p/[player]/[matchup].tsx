@@ -1,23 +1,13 @@
+import { Mongo } from ':/lib/mongodb';
 import { race, racesForMatchup } from ':/lib/types';
 import { Page } from ':/view/Page';
-import { SubmitMatchForm } from ':/view/SubmitMatchForm';
-import { Alert, AlertIcon, AlertTitle, Center, Flex, Heading, HStack, IconButton, Image, Spacer, Stat, StatArrow, StatHelpText, StatNumber, Table, TableContainer, Tbody, Td, Text, Tr } from '@chakra-ui/react';
-import React from 'react';
 import { Race } from ':/view/Race';
+import { RecentMatch, RecentMatchesTable } from ':/view/RecentMatchesTable';
+import { findRecentMatches } from ":/lib/findRecentMatches";
+import { ResultTicker } from ':/view/ResultTicker';
+import { SubmitMatchForm } from ':/view/SubmitMatchForm';
+import { Alert, AlertIcon, AlertTitle, Center, Flex, HStack, Heading, Spacer, Stat, StatNumber, Table, TableContainer, Tbody, Td, Text, Tr } from '@chakra-ui/react';
 import { NextPageContext } from 'next';
-import { Mongo } from ':/lib/mongodb';
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
-
-export const ResultTicker = ({ change }: { change: number }) => (
-    <StatHelpText>
-        <StatArrow
-            type={change >= 0 ? 'increase' : 'decrease'}
-            filter={change === 0 ? 'saturate(0)' : ''}
-        />
-        {Math.abs(change)}
-    </StatHelpText>
-);
 
 export type PageAccountProps = {
     now: number,
@@ -34,16 +24,9 @@ export type PageAccountProps = {
             net: number,
             description: string
         }[],
-        recentMatches: {
-            build: string,
-            change: number,
-            date: number
-        }[]
+        recentMatches: RecentMatch[]
     }
 }
-
-TimeAgo.addLocale(en);
-const timeAgo = new TimeAgo('en-US');
 
 export default function PageAccount({ now, data }: PageAccountProps) {
     return (
@@ -106,25 +89,7 @@ export default function PageAccount({ now, data }: PageAccountProps) {
                 ? (
                     <TableContainer width="100%">
                         <Heading size="xs">Recent matches</Heading>
-                        <Table size="sm">
-                            <Tbody>
-                                {data.recentMatches.map(({ date, build, change }, i) => (
-                                    <Tr key={i}>
-                                        <Td>
-                                            <Stat size="sm">
-                                                <ResultTicker change={change}/>
-                                            </Stat>
-                                        </Td>
-                                        <Td width="2500px" whiteSpace="break-spaces">
-                                            {build}
-                                        </Td>
-                                        <Td>
-                                            {timeAgo.format(date, 'twitter', { now })}
-                                        </Td>
-                                    </Tr>
-                                ))}
-                            </Tbody>
-                        </Table>
+                        <RecentMatchesTable recentMatches={data.recentMatches} now={now}/>
                     </TableContainer>
                 )
                 : (
@@ -185,21 +150,13 @@ export async function getServerSideProps(ctx: NextPageContext): Promise<{ props:
                 }
             }
         ]).toArray(),
-        db.find({
-            name: {
-                $regex: `^${player}$`,
-                $options: 'i'
+        findRecentMatches({
+            player,
+            filter: {
+                me,
+                them,
             },
-            me,
-            them
-        }).limit(12).sort({
-            date: -1
-        }).project<{ date: Date, build: string, change: number }>({
-            _id: 0,
-            date: 1,
-            build: 1,
-            change: 1
-        }).toArray(),
+        }),
     ]);
 
     // high tier stuff

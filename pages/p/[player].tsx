@@ -3,11 +3,18 @@ import { Option } from ':/view/Option';
 import { Options } from ':/view/Options';
 import { Page } from ':/view/Page';
 import { Race } from ':/view/Race';
-import { Center } from '@chakra-ui/react';
+import { RecentMatch, RecentMatchesTable } from ':/view/RecentMatchesTable';
+import { findRecentMatches } from ":/lib/findRecentMatches";
+import { Center, TableContainer } from '@chakra-ui/react';
+import { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-export default function PagePlayer() {
+export interface PagePlayerProps {
+    now: number;
+    recentMatches: RecentMatch[];
+}
+export default function PagePlayer({ now, recentMatches }: PagePlayerProps) {
     const player = useRouter().query.player as string;
     const [me, setMe] = useState(0);
     const [opponent, setOpponent] = useState(0);
@@ -53,8 +60,8 @@ export default function PagePlayer() {
     return (
         <Page title="Ladder">
             <Options selected={me}>
-                {races.map(race => (
-                    <Option icon={<Race race={race} size="5rem"/>} key={race}>
+                {races.map((race, i) => (
+                    <Option icon={<Race race={race} size="5rem"/>} onClick={() => setMe(i)} key={race}>
                         {race}
                     </Option>
                 ))}
@@ -63,12 +70,27 @@ export default function PagePlayer() {
                 vs
             </Center>
             <Options selected={opponent}>
-                {races.map(race => (
-                    <Option icon={<Race race={race} size="5rem"/>} key={race}>
+                {races.map((race, i) => (
+                    <Option icon={<Race race={race} size="5rem"/>} onClick={() => setOpponent(i)} key={race}>
                         {race}
                     </Option>
                 ))}
             </Options>
+            <TableContainer>
+                <RecentMatchesTable recentMatches={recentMatches} now={now}/>
+            </TableContainer>
         </Page>
     )
+}
+
+export async function getServerSideProps({ query }: GetServerSidePropsContext): Promise<{ props: PagePlayerProps }> {
+    const recentMatches = await findRecentMatches({
+        player: String(query.player),
+    });
+    return {
+        props: {
+            now: Date.now(),
+            recentMatches,
+        }
+    };
 }
