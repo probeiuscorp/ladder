@@ -6,7 +6,9 @@ import * as Yup from 'yup';
 
 const SubmitSchema = Yup.object({
     name: Yup.string().required(),
-    build: Yup.string().required(),
+    their: Yup.string().required(),
+    mine: Yup.string().required(),
+    why: Yup.string().required(),
     me: Yup.string().oneOf(races).required(),
     them: Yup.string().oneOf(races).required(),
     change: Yup.number().required()
@@ -32,13 +34,15 @@ export default async function handler(
         return;
     }
 
-    const { name, build, change, me, them } = match;
+    const { name, their, mine, change, why, me, them } = match;
     const mongo = await Mongo;
     const db = mongo.db('ladder').collection('probeiuscorp');
     
     await db.insertOne({
         name,
-        build,
+        build: their,
+        myBuild: mine,
+        why,
         me,
         them,
         change,

@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "dev": "PORT=3012 next dev",
+    "dev": "PORT=3030 next dev",
     "build": "NODE_ENV=production next build",
     "start": "NODE_ENV=production PORT=3012 next start"
   },

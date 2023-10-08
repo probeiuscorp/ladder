@@ -9,26 +9,32 @@ export type SubmitMatchFormProps = {
 }
 
 export function SubmitMatchForm({ data }: SubmitMatchFormProps) {
+    const theirBuild = useId();
+    const myBuild = useId();
     const change = useId();
-    const description = useId();
+    const why = useId();
     
     return (
         <Formik
             initialValues={{
-                description: '',
+                theirBuild: '',
+                myBuild: '',
                 change: '',
-                form: ''
+                form: '',
+                why: '',
             }}
             onSubmit={async (values, actions) => {
-                const buildId = parse.number(values.description);
+                const buildId = parse.number(values.theirBuild);
                 const build = buildId === null
-                    ? values.description
+                    ? values.theirBuild
                     : data.builds[buildId - 1].description;
                 
                 const body = JSON.stringify({
                     name: data.name,
-                    build,
+                    their: build,
+                    mine: values.myBuild,
                     change: parse.number(values.change),
+                    why: values.why,
                     me: data.me,
                     them: data.them,
                 });
@@ -53,16 +59,16 @@ export function SubmitMatchForm({ data }: SubmitMatchFormProps) {
         >
             {({ handleSubmit, errors, touched, isSubmitting }) => (
                 <form style={{ width: '100%' }} onSubmit={handleSubmit}>
-                    <FormControl isInvalid={!!errors.description && !!touched.change}>
-                        <FormLabel fontSize="sm" pt={2} htmlFor={description}>
-                            Build Description
+                    <FormControl isInvalid={!!errors.theirBuild && !!touched.theirBuild}>
+                        <FormLabel fontSize="sm" pt={2} htmlFor={theirBuild}>
+                            Their Build
                         </FormLabel>
                         <Field
                             as={Input}
-                            id={description}
+                            id={theirBuild}
                             autoFocus
                             autoComplete="off"
-                            name="description"
+                            name="theirBuild"
                             variant="filled"
                             validate={(value: string) => {
                                 const parsed = parse.number(value);
@@ -72,7 +78,23 @@ export function SubmitMatchForm({ data }: SubmitMatchFormProps) {
                             }}
                         />
                         <FormErrorMessage>
-                            {errors.description}
+                            {errors.theirBuild}
+                        </FormErrorMessage>
+                    </FormControl>
+                    <FormControl isInvalid={!!errors.myBuild && !!touched.myBuild}>
+                        <FormLabel fontSize="sm" pt={2} htmlFor={myBuild}>
+                            My Build
+                        </FormLabel>
+                        <Field
+                            as={Input}
+                            id={myBuild}
+                            autoFocus
+                            autoComplete="off"
+                            name="myBuild"
+                            variant="filled"
+                        />
+                        <FormErrorMessage>
+                            {errors.myBuild}
                         </FormErrorMessage>
                     </FormControl>
                     <FormControl isInvalid={!!errors.change && !!touched.change}>
@@ -91,6 +113,24 @@ export function SubmitMatchForm({ data }: SubmitMatchFormProps) {
                         />
                         <FormErrorMessage>
                             {errors.change}
+                        </FormErrorMessage>
+                    </FormControl>
+                    <FormControl isInvalid={!!errors.why && !!touched.why}>
+                        <FormLabel fontSize="sm" pt={2} htmlFor={why}>
+                            Because
+                        </FormLabel>
+                        <Field
+                            as={Input}
+                            id={why}
+                            autoComplete="off"
+                            name="why"
+                            variant="filled"
+                            validate={(value: string) => {
+                                if(value.length < 3) return 'Not optional';
+                            }}
+                        />
+                        <FormErrorMessage>
+                            {errors.why}
                         </FormErrorMessage>
                     </FormControl>
                     <Spacer height={2}/>
