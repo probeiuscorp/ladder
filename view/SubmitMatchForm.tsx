@@ -88,7 +88,6 @@ export function SubmitMatchForm({ data }: SubmitMatchFormProps) {
                         <Field
                             as={Input}
                             id={myBuild}
-                            autoFocus
                             autoComplete="off"
                             name="myBuild"
                             variant="filled"
